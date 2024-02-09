@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {SIG_VALIDATION_FAILED_UINT} from "src/common/Constants.sol";
-import {ValidationData} from "src/common/Types.sol";
+import {SIG_VALIDATION_FAILED_UINT} from "../common/Constants.sol";
+import {ValidationData} from "../common/Types.sol";
 
 function _intersectValidationData(ValidationData a, ValidationData b) pure returns (ValidationData validationData) {
     assembly {
@@ -17,7 +17,9 @@ function _intersectValidationData(ValidationData a, ValidationData b) pure retur
             validationData := xor(a_vd, mul(xor(a_vd, b_vd), gt(b_vd, a_vd)))
             // validUntil
             a_vd := and(0x000000000000ffffffffffff0000000000000000000000000000000000000000, a)
+            if iszero(a_vd) { a_vd := 0x000000000000ffffffffffff0000000000000000000000000000000000000000 }
             b_vd := and(0x000000000000ffffffffffff0000000000000000000000000000000000000000, b)
+            if iszero(b_vd) { b_vd := 0x000000000000ffffffffffff0000000000000000000000000000000000000000 }
             let until := xor(a_vd, mul(xor(a_vd, b_vd), lt(b_vd, a_vd)))
             if iszero(until) { until := 0x000000000000ffffffffffff0000000000000000000000000000000000000000 }
             validationData := or(validationData, until)
